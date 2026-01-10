@@ -7,9 +7,11 @@
 #include <unordered_map>
 #include <cstdlib>
 #include <bitset>
+#include <iostream>
 
-#include "Memory.hpp"
 #include "Processor.hpp"
+#include "Memory.hpp"
+
 
 #define F_CARRY 4
 #define F_HALF_CARRY 5
@@ -24,7 +26,7 @@ namespace DMG01
 		cycles.total_cycles += count; 
 	}
 
-	void Z80::set_flag(SM83& sm83, uint8_t val)
+	void SM83::set_flag(SM83& sm83, uint8_t val)
 	{
 		std::bitset<8>(sm83.af.byte.lower).set(val);
 	}
@@ -48,9 +50,10 @@ namespace DMG01
 		reg = static_cast<T1>(data);
 	}
 
+	template <typename T1, typename T2>
 	inline void SM83::ld_reg(T1& reg1, const T2& reg2)
 	{
-		reg = reg2;
+		reg1 = reg2;
 	}
 
 	template <typename T>
@@ -67,7 +70,6 @@ namespace DMG01
 
 	inline void SM83::rlca(uint8_t& reg)
 	{
-		if()
 	}
 	/*
 	  @brief Processes opcodes and calls the according function
@@ -101,11 +103,10 @@ namespace DMG01
 			add_cycles(cycles, 1);
 			break;
 		case 0x06: /* LD B, d6 */
-			ld_imm(sm83.bc.byte.higher, ram.space[sm83.pc++]);
+			ld_imm(sm83.bc.byte.higher, memory.space[sm83.pc++]);
 			add_cycles(cycles, 2);
 			break;
 		case 0x07:
-			
 			add_cycles(cycles, 1);
 			break;
 		default:

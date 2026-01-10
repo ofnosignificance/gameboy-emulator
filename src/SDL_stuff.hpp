@@ -22,7 +22,7 @@ namespace DMG01
 		bool check_polling_event();
 		void render_text();
 		void clear_memory();
-	protected:
+	private:
 		const SDL_Color red = {255, 0, 0, 0};
 		const SDL_Color black = {0, 0, 0, 0};
 		const SDL_Color white = {255, 255, 255, 0};

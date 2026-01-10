@@ -41,5 +41,5 @@ namespace DMG01
 		inline void dec_reg(T& val);
 		inline void rlca(uint8_t& reg);
 		void process_opcodes(const uint8_t opcode, Memory& memory, SM83& sm83);
-};   
+	};   
 }

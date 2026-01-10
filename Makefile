@@ -2,7 +2,7 @@ NAME := gameboy
 CXX := g++
 CXXFLAGS := -Wall -Wextra -pedantic -std=c++17 -O3
 
-LDFLAGS := -lsfml-window -lsfml-system -lsfml-graphics
+LDFLAGS := $(pkg-config --cflags --libs sdl2 SDL2_ttf)
 
 DST_DIR := dst
 SRC_DIR := src

@@ -7,22 +7,15 @@
 #include "Memory.hpp"
 #include "Common.hpp"
 
-namespace DMG01 {
-	int main(int argc, char* argv[])
-	{
+int main(int argc, char* argv[])
+{
 	
-		SM83 sm83;
-		Memory memory;
-		while(sm83.pc < MEMORY_SIZE && window_debugger != NULL) {
-			memory.space[sm83.pc];
-			sm83.pc++;
-			sm83.process_opcode(opcode, memory, sm83);
-			display_debug_info();
-			while(SDL_PollEvent(&event)) {
-				if(event.type == SDL_QUIT) window_debugger = NULL;
-			}
-		}
+	DMG01::SM83 sm83;
+	DMG01::Memory memory;
+	while(sm83.pc < DMG01::MEMORY_SIZE) {
+		const uint8_t opcode = memory.space[sm83.pc];
+		sm83.pc++;
+		sm83.process_opcodes(opcode, memory, sm83);
 	}
-
-
 }
+

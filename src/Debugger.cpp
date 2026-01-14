@@ -3,5 +3,4 @@
 
 namespace DMG01
 {
-	void Debugger_Window::read_debug_info();	
 }

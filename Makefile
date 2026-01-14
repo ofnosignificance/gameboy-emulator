@@ -2,14 +2,16 @@ NAME := gameboy
 CXX := g++
 CXXFLAGS := -Wall -Wextra -pedantic -std=c++17 -O3
 
-LDFLAGS := $(pkg-config --cflags --libs sdl2 SDL2_ttf)
+LDFLAGS := -lSDL2 -lSDL2_ttf
 
 DST_DIR := dst
 SRC_DIR := src
 
 OBJS := $(DST_DIR)/Processor.cpp.o \
+		$(DST_DIR)/SDL_stuff.cpp.o \
         $(DST_DIR)/Main.cpp.o \
-        $(DST_DIR)/Memory.cpp.o
+        $(DST_DIR)/Memory.cpp.o \
+		$(DST_DIR)/Debugger.cpp.o
 
 all: $(DST_DIR) $(NAME)
 

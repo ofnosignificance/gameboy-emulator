@@ -1,19 +1,39 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <stdexcept>
 
 #include "SDL_stuff.hpp"
 #include "Common.hpp"
 
 namespace DMG01
 {
+	Generic_SDL_Window::Generic_SDL_Window(const uint32_t win_x, const uint32_t win_y)
+	{
+		this->win_x = win_x;
+		this->win_y = win_y;
+	}
+	Generic_SDL_Window::~Generic_SDL_Window()
+	{
+		SDL_DestroyTexture(this->texture);
+		SDL_DestroyRenderer(this->renderer);
+		SDL_DestroyWindow(this->window);
+		TTF_Quit();
+		SDL_Quit();
+	}
 	void Generic_SDL_Window::create_window()
 	{
+		if(SDL_Init(SDL_INIT_EVERYTHING) < 0) {
+			throw std::runtime_error("SDL couldn't be intitalized");
+		}
+		if(TTF_Init() < 0) {
+			std::runtime_error("SDL_ttf couldn't be initalized");
+		}
 		this->window = SDL_CreateWindow(WINDOW_NAME_DEBUG,
 										SDL_WINDOWPOS_CENTERED,
 										SDL_WINDOWPOS_CENTERED,
-										WINDOW_SIZE_X,
-										WINDOW_SIZE_Y,
-										1);
+										this->win_x,
+										this->win_y,
+										SDL_WINDOW_OPENGL);
 		if(!this->window) {
 			throw std::runtime_error("Failed to create SDL window");
 		}
@@ -21,24 +41,23 @@ namespace DMG01
 		if(!this->renderer) {
 			throw std::runtime_error("Failed to create SDL renderer");
 		}
-	}
-	void Generic_SDL_Window::create_text(const char* message)
-	{
-		TTF_Init();
-		TTF_Font* font = TTF_OpenFont(FONT_DEFAULT_DEBUG,
-									  FONT_SIZE__DEFAULT_DEBUG);
+		this->font = TTF_OpenFont(FONT_DEFAULT_DEBUG,
+								  FONT_SIZE__DEFAULT_DEBUG);
 		if(!font) {
 			throw std::runtime_error("Couldn't load font for SDL window");
 		}
-	    this->surface = TTF_RenderText_Solid(font, messsage, this->white);
-		this->texture = SDL_CreateTextureFromSurface(renderer, surface);
-		this->rectangle.x = WINDOW_SIZE_X - surface->w * 0.5;
-		this->rectangle.y = WINDOW_SIZE_Y - surface->h * 0.5;
-		this->rectangle.w = surface->w;
-		this->rectangle.h = surface->h;
-
-		SDL_FreeSurface(surface);
-		TTF_Quit();
+	}
+	void Generic_SDL_Window::update_text(const char* message)
+	{
+		if(this->texture) SDL_DestroyTexture(this->texture);
+		SDL_Surface* tmp_surface = TTF_RenderText_Solid(this->font, message, this->white);
+		if(!tmp_surface) return;
+		this->texture = SDL_CreateTextureFromSurface(this->renderer, tmp_surface);
+		this->rectangle.x = this->win_x;
+		this->rectangle.y = this->win_y;
+		this->rectangle.w = tmp_surface->w;
+		this->rectangle.h = tmp_surface->h;
+		SDL_FreeSurface(tmp_surface);
 	}
 	bool Generic_SDL_Window::check_polling_event()
 	{
@@ -51,17 +70,16 @@ namespace DMG01
 	}
 	void Generic_SDL_Window::render_text()
 	{
-		SDL_SetRenderDrawColor(this->renderer, 0, 0, 0, 255);
+		SDL_SetRenderDrawColor(this->renderer, 
+							   this->black.r, 
+							   this->black.g, 
+							   this->black.b,
+							   this->black.a); 
 		SDL_RenderClear(this->renderer);
-		SDL_RenderCopy(this->renderer, this->texture, NULL, &this->rectangle);
+		if(this->texture) {
+			SDL_RenderCopy(this->renderer, this->texture, NULL, &this->rectangle);
+		}
 		SDL_RenderPresent(this->renderer);
-		SDL_Delay(10);
 	}
-	void Generic_SDL_Window::clear_memory()
-	{
-		SDL_DestroyTexture(this->texture);
-		SDL_DestroyRenderer(this->renderer);
-		SDL_DestroyWindow(this->window);
-		SDL_Quit();
-	}
+
 }

@@ -26,7 +26,7 @@ namespace DMG01
 			throw std::runtime_error("SDL couldn't be intitalized");
 		}
 		if(TTF_Init() < 0) {
-			std::runtime_error("SDL_ttf couldn't be initalized");
+			throw std::runtime_error("SDL_ttf couldn't be initalized");
 		}
 		this->window = SDL_CreateWindow(WINDOW_NAME_DEBUG,
 										SDL_WINDOWPOS_CENTERED,
@@ -42,19 +42,20 @@ namespace DMG01
 			throw std::runtime_error("Failed to create SDL renderer");
 		}
 		this->font = TTF_OpenFont(FONT_DEFAULT_DEBUG,
-								  FONT_SIZE__DEFAULT_DEBUG);
+								  FONT_SIZE_DEFAULT_DEBUG);
 		if(!font) {
 			throw std::runtime_error("Couldn't load font for SDL window");
 		}
 	}
+
 	void Generic_SDL_Window::update_text(const char* message)
 	{
 		if(this->texture) SDL_DestroyTexture(this->texture);
 		SDL_Surface* tmp_surface = TTF_RenderText_Solid(this->font, message, this->white);
 		if(!tmp_surface) return;
 		this->texture = SDL_CreateTextureFromSurface(this->renderer, tmp_surface);
-		this->rectangle.x = this->win_x;
-		this->rectangle.y = this->win_y;
+		this->rectangle.x = 0;
+		this->rectangle.y = 0;
 		this->rectangle.w = tmp_surface->w;
 		this->rectangle.h = tmp_surface->h;
 		SDL_FreeSurface(tmp_surface);

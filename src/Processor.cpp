@@ -46,6 +46,7 @@
 #define F_ZERO 7
 /** @} */
 
+#define ADD_CYC(val) add_cycles(cycles, val)
 
 namespace DMG01
 {
@@ -110,6 +111,21 @@ namespace DMG01
 		else if(sm83.test_flag(R_F, F_CARRY)) 
 			sm83.set_flag(R_F, F_CARRY, false);
 	}
+	
+	template <typename T1, typename T2>
+	inline void SM83::add_reg(T1& aug, const T2& add)
+	{
+		aug =+ add;
+	}
+	
+	inline void SM83::rrca(SM83& sm83)
+	{
+		R_A = (R_A << 1 | R_A >> 7);
+		if(sm83.test_flag(R_F, F_CARRY)) 
+			sm83.set_flag(R_F, F_CARRY, true);
+		else if(sm83.test_flag(R_F, F_CARRY)) 
+			sm83.set_flag(R_F, F_CARRY, false);
+	}
 	/*
 	  @brief Processes opcodes and calls the according function
 	  @param opcode The opcode it should process
@@ -119,35 +135,67 @@ namespace DMG01
 		switch(opcode)
 		{
 		case 0x00: /* NOP */
-			add_cycles(cycles, 4);
+			ADD_CYC(4);
 			break;
 		case 0x01: /* LD BC, n16 */
 			ld_imm(R_BC, memory.space[R_PC++]);
-			add_cycles(cycles, 12);
+			ADD_CYC(12);
 			break;
 		case 0x02: /* LD (BC), A */
 			ld_reg(memory.space[R_BC], R_A);
-			add_cycles(cycles, 8);
+			ADD_CYC(8);
 			break;
 		case 0x03: /* INC BC */ 
 			inc_reg(R_BC);
-			add_cycles(cycles, 8);
+			ADD_CYC(8);
 			break;
 		case 0x04: /* INC B */
 			inc_reg(R_B);
-			add_cycles(cycles, 4);
+			ADD_CYC(4);
 			break;
 		case 0x05: /* DEC B */
 			dec_reg(R_B);
-			add_cycles(cycles, 4);
+			ADD_CYC(4);
 			break;
 		case 0x06: /* LD B, d6 */
 			ld_imm(R_B, memory.space[R_PC++]);
-			add_cycles(cycles, 8);
+			ADD_CYC(8);
 			break;
 		case 0x07: /* RLCA */
 			rlca(sm83);
-			add_cycles(cycles, 4);
+			ADD_CYC(4);
+			break;
+		case 0x08: /* LD (a16), SP */
+			ld_imm(memory.space[R_PC++], R_SP);
+			ADD_CYC(20);
+			break;
+		case 0x09:
+			add(R_HL, R_BC);
+			ADD_CYC(8);
+			break;
+		case 0x0a:
+			ld_reg(R_A, memory.space[REG_BC]);
+			ADD_CYC(8);
+			break;
+		case 0x0b:
+			dec_reg(R_BC);
+			ADD_CYC(8);
+			break;
+		case 0x0c:
+			inc_reg(R_C);
+			ADD_CYC(4);
+			break;
+		case 0x0d:
+			dec_reg(R_C);
+			ADD_CYC(4);
+			break;
+		case 0x0e:
+			ld_imm(R_C, memory.space[R_PC++]);
+			ADD_CYC(8);
+			break;
+		case 0x0f:
+			rrca(sm83);
+			ADD_CYC(4);
 			break;
 		default:
 			std::cout << "The program has seemingly run into an unrecognized opcode\n";

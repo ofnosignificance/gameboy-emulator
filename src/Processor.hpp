@@ -41,6 +41,9 @@ namespace DMG01
 		template <typename T>
 		inline void dec_reg(T& val);
 		inline void rlca(SM83& sm83);
+		template <typename T1, typename T2>
+		inline void add_reg(T1& aug, const T2& add);
+		inline void rrca(SM83& sm83);
 		void process_opcodes(const uint8_t opcode, Memory& memory, SM83& sm83);
 	};   
 }

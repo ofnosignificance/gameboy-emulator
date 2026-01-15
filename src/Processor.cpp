@@ -11,6 +11,7 @@
 
 #include "Processor.hpp"
 #include "Memory.hpp"
+#include "Common.hpp"
 
 /** * @name Register shorthands
  * These macros are there so I don't have to write out 
@@ -29,7 +30,7 @@
 #define R_DE sm83.de.word
 #define R_B sm83.bc.byte.higher
 #define R_C sm83.bc.byte.lower
-#define R_BC sm83.bc.byte.word
+#define R_BC sm83.bc.word
 #define R_PC sm83.pc
 #define R_SP sm83.sp
 /** @} */
@@ -54,9 +55,14 @@ namespace DMG01
 		cycles.total_cycles += count; 
 	}
 
-	void SM83::set_flag(SM83& sm83, uint8_t val, bool on=true)
+	inline void SM83::set_flag(uint8_t& f, const uint8_t index, const bool on)
 	{
-		std::bitset<8>(sm83.af.byte.lower).set(val, on);
+		std::bitset<8>(f).set(index, on);
+	}
+	
+	inline bool SM83::test_flag(uint8_t& f, const uint8_t index)
+	{
+		return std::bitset<8>(f).test(index);
 	}
 
 	/*
@@ -99,9 +105,9 @@ namespace DMG01
 	inline void SM83::rlca(SM83& sm83)
 	{
 		R_A = (R_A >> 1 | R_A << 7);
-		if(CHECK_BIT(R_F, 7)) 
+		if(sm83.test_flag(R_F, F_CARRY)) 
 			sm83.set_flag(R_F, F_CARRY, true);
-		else if(!CHECK_BIT(R_F, 7)) 
+		else if(sm83.test_flag(R_F, F_CARRY)) 
 			sm83.set_flag(R_F, F_CARRY, false);
 	}
 	/*
@@ -120,7 +126,7 @@ namespace DMG01
 			add_cycles(cycles, 12);
 			break;
 		case 0x02: /* LD (BC), A */
-			ld_reg(memory.space[R_BC, R_A);
+			ld_reg(memory.space[R_BC], R_A);
 			add_cycles(cycles, 8);
 			break;
 		case 0x03: /* INC BC */ 
@@ -140,8 +146,8 @@ namespace DMG01
 			add_cycles(cycles, 8);
 			break;
 		case 0x07: /* RLCA */
-			rlca
-				add_cycles(cycles, 4);
+			rlca(sm83);
+			add_cycles(cycles, 4);
 			break;
 		default:
 			std::cout << "The program has seemingly run into an unrecognized opcode\n";

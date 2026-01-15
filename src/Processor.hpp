@@ -29,7 +29,8 @@ namespace DMG01
 		uint16_t sp;
 		Cycles cycles;
 		inline void add_cycles(Cycles& cycles, const uint32_t count);
-		void set_flag(SM83& sm83, uint8_t val);
+		inline void set_flag(uint8_t& f, uint8_t index, bool on=true);
+		inline bool test_flag(uint8_t& f, const uint8_t index);
 		void load_bin(const std::string& filename, Memory& memory);
 		template <typename T1, typename T2>
 		inline void ld_imm(T1& reg, const T2& data);
@@ -39,7 +40,7 @@ namespace DMG01
 		inline void inc_reg(T& val);
 		template <typename T>
 		inline void dec_reg(T& val);
-		inline void rlca(uint8_t& reg);
+		inline void rlca(SM83& sm83);
 		void process_opcodes(const uint8_t opcode, Memory& memory, SM83& sm83);
 	};   
 }

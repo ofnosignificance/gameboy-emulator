@@ -1,0 +1,4 @@
+- add *_wrapped equivalents of SDL2_ttf functions
+- make a graphical debugger, that can go through each instruction, halt, etc.
+- implement all opcodes 
+- make a proper GUI
